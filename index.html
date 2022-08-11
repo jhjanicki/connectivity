@@ -1,0 +1,912 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <title>Connectivity</title>
+  <meta name="description" content="Ocean floor">
+  <meta name="author" content="Julia Janicki">
+  <link rel="shortcut icon" href="#">
+  <link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Eczar:wght@400;600;700&family=Work+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    rel="stylesheet">
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      color: #0C1B34;
+      font-family: 'Work Sans', sans-serif;
+    }
+
+    #map {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      background-color: #0C1B34;
+    }
+
+    h1 {
+      font-size: 17px;
+      line-height: 25px;
+    }
+
+    h2 {
+      font-size: 15px;
+      line-height: 20px;
+      margin-bottom: 10px;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    .subtitle {
+      font-size: 14px;
+    }
+
+    #console {
+      position: absolute;
+      width: 300px;
+      margin: 10px;
+      padding: 10px 20px 10px 30px;
+      background-color: #F0F0F1;
+      border-radius: 5px;
+      z-index: 15;
+      transition: 0.3s ease-in-out;
+      box-shadow: 0 1px 1px 0 rgba(66, 66, 66, 0.08), 0 1px 3px 1px rgba(66, 66, 66, 0.16);
+    }
+
+    .active {
+      transform: translate3d(-280px, 0, 0);
+      transition: 0.3s ease-in-out;
+    }
+
+    .itemWrapper {
+      margin-top: -20px;
+    }
+
+    #toggleConsole {
+      position: absolute;
+      right: 5px;
+      top: 0px;
+    }
+
+    #toggleConsole img {
+      width: 16px;
+      opacity: 0.7;
+    }
+
+    #toggleConsole img:hover {
+      opacity: 0.5;
+      transition: all .5s ease;
+      cursor: pointer;
+    }
+
+    .toggle {
+      position: relative;
+      height: 14px;
+      width: 35px;
+      border-radius: 15px;
+      background: #cfcfcf;
+      margin: 8px 0;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 100%;
+      height: 200%;
+      position: absolute;
+      top: -7px;
+      left: 0;
+      z-index: 2;
+      margin: 0
+    }
+
+    .toggle input:nth-child(2):checked {
+      z-index: 1;
+    }
+
+    .toggle__pointer {
+      position: absolute;
+      top: -3.5px;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 15px;
+      -webkit-transition: left .15s ease-out;
+      transition: left .15s ease-out;
+    }
+
+    .toggle input:nth-child(2):checked+.toggle__pointer {
+      left: 18px;
+      background-color: #777777;
+    }
+
+    .toggleSeamount {
+      background-color: #189B68;
+    }
+
+    .toggleRidges {
+      background-color: #6547a4;
+    }
+
+    .toggleTrenches {
+      background-color: #E7685A;
+    }
+
+    .toggleCanyons {
+      background-color: #FFC554;
+    }
+
+    .flip {
+      -webkit-transform: scaleX(-1);
+      transform: scaleX(-1);
+      opacity: 1;
+    }
+
+    #console h1,
+    #console h2 {
+      text-align: left;
+    }
+
+    .verticalLine {
+      margin-right: 5px;
+      border-right: 0.3px solid #ECE8E1;
+    }
+
+    #title {
+      font-family: 'Eczar', serif;
+      color: #0c1b34;
+      font-weight: 700;
+      margin-left: -10px;
+      margin-bottom: 15px;
+    }
+
+    .mapboxgl-popup {
+      max-width: 300px !important;
+      font-family: 'Work Sans', sans-serif;
+      text-align: left;
+      z-index: 20;
+    }
+
+    .mapboxgl-popup-content {
+      font-family: 'Work Sans', sans-serif;
+      padding: 0;
+    }
+
+    .mapboxgl-popup-content-wrapper {
+      padding: 1%;
+    }
+
+    .mapboxgl-popup-content h3 {
+      text-align: left;
+      font-size: 16px;
+      margin: 0;
+      display: block;
+      padding: 15px;
+      font-weight: 700;
+      margin-top: -5px;
+    }
+
+    .mapboxgl-popup.nodes h3 {
+      background: #636363 !important;
+      color: #fff;
+    }
+
+    .mapboxgl-popup-content h4 {
+      margin: 0;
+      display: block;
+      font-size: 14px;
+      padding: 10px;
+      font-weight: 400;
+    }
+
+    .mapboxgl-container {
+      cursor: pointer;
+    }
+
+    .mapboxgl-popup-anchor-top>.mapboxgl-popup-content {
+      margin-top: 3px;
+    }
+
+    .mapboxgl-popup-anchor-top>.mapboxgl-popup-tip {
+      border-bottom-color: rgb(61, 59, 59);
+    }
+
+    .mapboxgl-popup-close-button {
+      transform: scale(2);
+      color: white;
+      padding: 0px;
+      margin-right: 10px;
+    }
+
+    .mapboxgl-popup-close-button:hover,
+    .mapboxgl-popup-close-button:active,
+    .mapboxgl-popup-close-button:target {
+      background: none !important;
+      border: none !important;
+      outline: none !important;
+      color: #cfcfcf;
+      transition: all 0.5s ease;
+    }
+
+    .instruction {
+      margin-left: -15px;
+      margin-top: 20px;
+    }
+
+    .instruction p {
+      color: #4159A8;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .button {
+      margin-bottom: 10px;
+      margin-top: 10px;
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.5;
+      text-transform: uppercase;
+      background-color: none;
+      max-width: 100px;
+      text-align: center;
+      -webkit-transition: all .5s ease;
+      -moz-transition: all .5s ease;
+      -ms-transition: all .5s ease;
+      transition: all .5s ease;
+      padding: 10px;
+    }
+
+
+    .button:hover {
+      cursor: pointer;
+      -webkit-transition: all .5s ease;
+      -moz-transition: all .5s ease;
+      -ms-transition: all .5s ease;
+      transition: all .5s ease;
+    }
+
+    .button.nodes:hover {
+      color: white;
+    }
+
+    .button.nodes {
+      color: #777777;
+      border: 1.5px solid #777777;
+    }
+
+    .item {
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+
+    #loading {
+      top: 0;
+      left: 0;
+      position: fixed;
+      display: block;
+      opacity: .7;
+      background-color: #fff;
+      z-index: 99;
+    }
+
+    #loading-image {
+      position: relative;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: calc(50vh - 80px);
+      z-index: 100;
+    }
+
+    #loading {
+      width: 100%;
+      text-align: center;
+      height: 100%;
+    }
+
+    #logo {
+      position: absolute;
+      bottom: 22px;
+      right: 0px;
+      z-index: 5;
+    }
+
+    #logo img {
+      width: 120px;
+    }
+
+    @media screen and (max-width: 800px) {
+
+      #console {
+        width: 250px;
+      }
+
+      .active {
+        transform: translate3d(-230px, 0, 0);
+      }
+
+      h1 {
+        font-size: 16px;
+      }
+
+      h2 {
+        font-size: 12px;
+      }
+
+      #console {
+        padding: 10px 20px;
+      }
+
+      #title {
+        margin-top: -10px;
+      }
+
+      .mapboxgl-popup {
+        max-width: 290px !important;
+      }
+    }
+
+    @media screen and (max-width: 600px) {
+      body {
+        font-size: 11px !important;
+      }
+
+      #title {
+        font-size: 13px;
+      }
+
+      .subtitle {
+        font-size: 12px;
+      }
+
+      .active {
+        transform: translate3d(-230px, 0, 0);
+      }
+
+      h1 {
+        font-size: 14px;
+      }
+
+      h2 {
+        font-size: 12px;
+      }
+
+      .instruction p {
+        font-size: 10px;
+      }
+
+      .mapboxgl-popup {
+        transform: none !important;
+        top: 230px;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+      .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+      .mapboxgl-popup-anchor-center .mapboxgl-popup-tip,
+      .mapboxgl-popup-anchor-left .mapboxgl-popup-tip,
+      .mapboxgl-popup-anchor-right .mapboxgl-popup-tip,
+      .mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip,
+      .mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
+      .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip,
+      .mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip {
+        display: none !important;
+      }
+
+      #logo {
+        position: absolute;
+        bottom: 15px;
+        right: 0px;
+      }
+
+      #logo img {
+        width: 100px;
+      }
+
+      .mapboxgl-popup-content h4 {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id='map'></div>
+  <div id='console'>
+    <div class="verticalLine">
+      <span id="toggleConsole">
+        <img src="./img/toggle.png" />
+      </span>
+      <h1 id='title'>Connectivity</h1>
+      <div class='row itemWrapper'>
+        <h2 class="subtitle"> some text </h2>
+      </div>
+      <!-- <div class="itemWrapper">
+        <div class='row toggle item filters' id="seamountFilter">
+          <input id='' type="radio" value="seamountOn" name="toggle" checked='checked'>
+          <input id='' type="radio" value="seamountOff" name="toggle">
+          <div class="toggle__pointer toggleSeamount"></div>
+        </div>
+        <div class="item">
+          <h2>Seamounts</h2>
+        </div>
+      </div>
+      <div class="itemWrapper">
+        <div class='row toggle item filters' id="ridgesFilter">
+          <input id='' type="radio" value="ridgesOn" name="toggleRidges" checked='checked'>
+          <input id='' type="radio" value="ridgesOff" name="toggleRidges">
+          <div class="toggle__pointer toggleRidges"></div>
+        </div>
+        <div class="item">
+          <h2>Ridges</h2>
+        </div>
+      </div>
+      <div class="itemWrapper">
+        <div class='row toggle item filters' id="trenchesFilter">
+          <input id='' type="radio" value="trenchesOn" name="toggleTrenches" checked='checked'>
+          <input id='' type="radio" value="trenchesOff" name="toggleTrenches">
+          <div class="toggle__pointer toggleTrenches"></div>
+        </div>
+        <div class="item">
+          <h2>Trenches</h2>
+        </div>
+      </div>
+      <div class="itemWrapper">
+        <div class='row toggle item filters' id="canyonsFilter">
+          <input id='' type="radio" value="canyonsOn" name="toggleCanyons" checked='checked'>
+          <input id='' type="radio" value="canyonsOff" name="toggleCanyons">
+          <div class="toggle__pointer toggleCanyons"></div>
+        </div>
+        <div class="item">
+          <h2>Canyons</h2>
+        </div>
+      </div> -->
+
+      <div class="instruction itemWrapper" id="instruction">
+        <p class="item">Click on the circles and lines for more information</p>
+      </div>
+    </div>
+    <!-- end line -->
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.14.2/d3.js"></script>
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
+  <script src="data/nodes.js"></script>
+  <script src="data/edges.js"></script>
+  <script src="data/updatedEdges.js"></script>
+  <script>
+
+    var windowWidth = $(window).width();
+    var windowHeight = $(window).height();
+    var viewportWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    var viewportHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+
+    var mobile = false;
+    var iphone = false;
+    var safari = false;
+
+    let popup;
+    let legendShow = false;
+    let map;
+    let removedNode;
+    // let removedNodes = []
+    let currentNodes = nodes;
+    let currentEdges = edges;
+
+
+    $(window).resize(function () {
+      if (windowWidth != $(window).width() || windowHeight != $(window).height()) {
+        location.reload();
+        return;
+      }
+    });
+
+    if (/Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || viewportWidth < 600) {
+      mobile = true;
+    }
+
+    if (/iPhone/i.test(navigator.userAgent)) {
+      iphone = true;
+    }
+
+    //if Safari
+    const ua = navigator.userAgent.toLowerCase();
+    if (ua.indexOf('safari') != -1) {
+      if (ua.indexOf('chrome') > -1) { // Chrome
+      } else {// Safari
+        safari = true;
+      }
+    }
+
+    if (viewportWidth < 700) {
+      $("#instruction").css("display", "none");
+    } else {
+      $("#instruction").css("display", "inherit");
+    }
+
+    mapboxgl.accessToken = 'pk.eyJ1IjoidGhldGhpcmRwb2xlIiwiYSI6ImNLSWVDcWsifQ.vVx5f1hjIvHBeSpaY3NUkQ';
+
+    let nodesData = {
+      'type': 'FeatureCollection',
+      'features': [
+      ]
+    };
+
+    let edgesData = {
+      'type': 'FeatureCollection',
+      'features': [
+      ]
+    };
+
+
+    if (mobile) {
+      map = new mapboxgl.Map({
+        container: 'map', // container element id
+        style: 'mapbox://styles/jhjanicki/cl3xt7dgs000415mylif9a5g7',
+        center: [127.963861, 26.426905], // initial map center in [lon, lat]
+        zoom: 2,
+        minZoom: 1
+      });
+
+    } else {
+      map = new mapboxgl.Map({
+        container: 'map', // container element id
+        style: 'mapbox://styles/jhjanicki/cl3xt7dgs000415mylif9a5g7',
+        center: [127.963861, 26.426905], // initial map center in [lon, lat]
+        zoom: 4,
+        minZoom: 1
+      });
+    }
+
+    let consoleHeight = $("#console").height() / 2;
+    $("#toggleConsole").css("top", consoleHeight);
+
+    map.on('load', function () {
+      init();
+      $("#toggleConsole").click(function () {
+        $("#console").toggleClass("active");
+        $("#toggleConsole img").toggleClass("flip");
+      });
+    });
+
+    if (!mobile) {
+      map.addControl(new mapboxgl.NavigationControl());
+    }
+
+
+    function init() {
+      $('#loading').hide();
+
+      createNodeData(nodes);
+      createEdgeData(edges);
+
+
+      map.addLayer({
+        id: 'edgesLayer',
+        type: 'line',
+        source: {
+          type: 'geojson',
+          data: edgesData
+        },
+        paint: {
+          "line-color": [
+            'interpolate',
+            ["linear"],
+            ['get', 'weight'],
+            0.3,
+            "#fee5d9",
+            0.4,
+            "#fcbba1",
+            0.5,
+            "#fc9272",
+            0.6,
+            "#fb6a4a",
+            0.7,
+            "#ef3b2c",
+            0.8,
+            "#cb181d",
+            0.9,
+            "#99000d"
+          ],
+          'line-width': [
+            'interpolate',
+            ["linear"],
+            ['get', 'weight'],
+            0.3,
+            1,
+            0.9,
+            9
+          ],
+          'line-opacity': 1
+        },
+        layout: {
+          'line-cap': 'round',
+          'line-join': 'round'
+        }
+      });
+
+      map.addLayer({
+        id: 'nodesLayer',
+        type: 'circle',
+        source: {
+          type: 'geojson',
+          data: nodesData
+        },
+        paint: {
+          "circle-color": '#636363',
+          'circle-radius': [
+            'interpolate',
+            ["linear"],
+            ['get', 'betweenness_C'],
+            0,
+            2,
+            1,
+            12
+          ],
+          'circle-stroke-color': 'white',
+          'circle-stroke-width': 1,
+          'circle-opacity': 1
+        }
+      });
+
+    }
+
+
+    function createNodeData(data) {
+
+      nodesData['features'] = [];
+
+      data.forEach(function (row) {
+        const feature =
+        {
+          'type': 'Feature',
+          'properties': {
+            'longitude': +row.long,
+            'latitude': +row.lat,
+            'name': row.name,
+            'depth': row.depth,
+            'tect': row.tect,
+            'region': row.region,
+            'eigen_C': row.eigen_C,
+            'betweenness_C': row.betweenness_C
+          },
+          'geometry': {
+            'type': 'Point',
+            'coordinates': [+row.long, +row.lat],
+          }
+        };
+        nodesData['features'].push(feature);
+      });
+    }
+
+    function createEdgeData(data) {
+
+      edgesData['features'] = [];
+
+      data.forEach(function (row) {
+        const feature =
+        {
+          'type': 'Feature',
+          'properties': {
+            'source': row.Source,
+            'target': row.Target,
+            'weight': row.Weight
+          },
+          'geometry': {
+            'type': 'LineString',
+            'coordinates': [findPoint(row.Source), findPoint(row.Target)],
+          }
+        };
+        edgesData['features'].push(feature);
+      });
+    }
+
+
+    function findPoint(name) {
+      const node = currentNodes.find(d => d.name === name);
+      //console.log(node)
+      return [node.long, node.lat]
+    }
+
+
+    function createEdges() {
+
+    }
+
+    function updateNodes() {
+
+      const newNodes = nodes.filter(d => d.name !== removedNode)
+      currentNodes = newNodes;
+      console.log(newNodes);
+      createNodeData(currentNodes);
+
+      map.getSource('nodesLayer').setData(nodesData);
+
+      popup.remove();
+
+    }
+
+    function updateEdges() {
+
+      const newEdges = updatedEdges.find(d => d.node === removedNode);
+      currentEdges = newEdges.edges;
+      console.log(newEdges);
+      createEdgeData(currentEdges);
+
+      map.getSource('edgesLayer').setData(edgesData);
+
+
+    }
+
+
+    map.on('click', 'nodesLayer', function (e) {
+
+      map.getCanvas().style.cursor = 'pointer';
+
+      var latitude = e.features[0].properties.latitude;
+      var longitude = e.features[0].properties.longitude;
+      var name = e.features[0].properties.name;
+      var depth = e.features[0].properties.depth;
+      var tect = e.features[0].properties.tect;
+      var region = e.features[0].properties.region;
+      var eigen_C = e.features[0].properties.eigen_C;
+      var betweenness_C = e.features[0].properties.betweenness_C;
+
+      removedNode = name;
+
+      // removedNodes.push(name);
+
+      var color = "#636363";
+
+      popup = new mapboxgl.Popup({
+        closeButton: true,
+        closeOnClick: true,
+        className: 'nodes'
+      })
+        .setHTML('<h3 class="nodes"><b>' + name + '</b></h3>'
+          + '<h4><b>Region</b>: ' + region + '<br>'
+          + '<b>Depth</b>: ' + depth + '<br>'
+          + '<b>Tect</b>: ' + tect + '<br>'
+          + '<b>Eigen</b>: ' + eigen_C + '<br>'
+          + '<b>In betweenness</b>: ' + betweenness_C + '</h4>'
+          + `<div class="button nodes">Remove</a></div>`)
+        .setLngLat([longitude, latitude])
+        .addTo(map);
+
+      $(".button").on('click', function () {
+        updateNodes();
+        updateEdges();
+      })
+
+
+      $(`.button.nodes`).hover(function () {
+        $(".button a").css("color", "white");
+        $(this).css("background-color", color);
+      }, function () {
+        $(".button a").css("color", color);
+        $(this).css("background-color", "white");
+      });
+      $(".mapboxgl-popup-tip").css("border-bottom-color", color);
+
+      $(".mapboxgl-popup-tip").css("border-bottom-color", color);
+
+    });
+
+
+    // map.on('click', 'edgesLayer', function (e) {
+
+    //   map.getCanvas().style.cursor = 'pointer';
+
+    //   var source = e.features[0].properties.source;
+    //   var target = e.features[0].properties.target;
+    //   var weight = e.features[0].properties.weight;
+
+    //   // removedNodes.push(name);
+
+    //   var color = "#636363";
+
+    //   popup = new mapboxgl.Popup({
+    //     closeButton: true,
+    //     closeOnClick: true,
+    //     className: 'nodes'
+    //   })
+    //     .setHTML('<h3 class="nodes"><b>' + source + "-" + target + '</b></h3>'
+    //       + '<h4><b>Weight</b>: ' + weight + '<br></h4>')
+    //     .setLngLat([e.lngLat.lng, e.lngLat.lat])
+    //     .addTo(map);
+
+
+    //   $(".mapboxgl-popup-tip").css("border-bottom-color", color);
+
+    //   $(".mapboxgl-popup-tip").css("border-bottom-color", color);
+
+    // });
+
+
+
+
+
+
+
+
+
+
+    // function callPopupEdges(e) {
+
+
+    //   map.getCanvas().style.cursor = 'pointer';
+
+    //   var source = e.features[0].properties.source;
+    //   var target = e.features[0].properties.target;
+    //   var weight = e.features[0].properties.weight;
+
+    //   // removedNodes.push(name);
+
+    //   var color = "#636363";
+
+    //   popup = new mapboxgl.Popup({
+    //     closeButton: true,
+    //     closeOnClick: true,
+    //     className: 'nodes'
+    //   })
+    //     .setHTML('<h3 class="nodes"><b>' + source + "-" + target + '</b></h3>'
+    //       + '<h4><b>Weight</b>: ' + weight + '<br></h4>')
+    //     .setLngLat([e.lngLat.lng, e.lngLat.lat])
+    //     .addTo(map);
+
+
+    //   $(".mapboxgl-popup-tip").css("border-bottom-color", color);
+
+    //   $(".mapboxgl-popup-tip").css("border-bottom-color", color);
+
+
+    // }
+
+
+
+
+    // const handleMapClick = (e) => {
+
+    //   let features = map.queryRenderedFeatures(e.point, {
+    //     layers: ['nodesLayer', 'edgesLayer']
+    //   });
+
+    //   if (!features) return;
+
+    //   const selectedFeature = features.find((feature) => ['nodesLayer', 'edgesLayer'].includes(feature.layer.id),);
+
+    //   if (!selectedFeature) return;
+
+    //   if (selectedFeature.source === "nodesLayer") {
+    //     callPopupNodes(e);
+    //   } else {
+    //     callPopupEdges(e);
+    //   }
+    // }
+
+    // map.on('click', function (e) {
+    //   handleMapClick(e);
+    // });
+
+
+
+  </script>
+</body>
+<div id="loading">
+  <img id="loading-image" src="./img/load.gif" alt="Loading..." />
+</div>
+
+</html>

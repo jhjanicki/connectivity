@@ -45,8 +45,10 @@
     }
 
     .subtitle {
-      font-size: 14px;
+      font-weight: 700;
+      text-decoration: underline;
     }
+
 
     #console {
       position: absolute;
@@ -130,17 +132,6 @@
       background-color: #189B68;
     }
 
-    .toggleRidges {
-      background-color: #6547a4;
-    }
-
-    .toggleTrenches {
-      background-color: #E7685A;
-    }
-
-    .toggleCanyons {
-      background-color: #FFC554;
-    }
 
     .flip {
       -webkit-transform: scaleX(-1);
@@ -162,7 +153,6 @@
       font-family: 'Eczar', serif;
       color: #0c1b34;
       font-weight: 700;
-      margin-left: -10px;
       margin-bottom: 15px;
     }
 
@@ -235,7 +225,6 @@
     }
 
     .instruction {
-      margin-left: -15px;
       margin-top: 20px;
     }
 
@@ -364,10 +353,6 @@
         font-size: 13px;
       }
 
-      .subtitle {
-        font-size: 12px;
-      }
-
       .active {
         transform: translate3d(-230px, 0, 0);
       }
@@ -430,9 +415,8 @@
         <img src="./img/toggle.png" />
       </span>
       <h1 id='title'>Connectivity</h1>
-      <div class='row itemWrapper'>
-        <h2 class="subtitle"> some text </h2>
-      </div>
+      <h2 class="subtitle"> Removed node: </h2>
+      <p id="removedNode"></p>
       <!-- <div class="itemWrapper">
         <div class='row toggle item filters' id="seamountFilter">
           <input id='' type="radio" value="seamountOn" name="toggle" checked='checked'>
@@ -486,7 +470,8 @@
   <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
   <script src="data/nodes.js"></script>
   <script src="data/edges.js"></script>
-  <script src="data/updatedEdges.js"></script>
+  <!-- <script src="data/updatedNodes.js"></script>
+  <script src="data/updatedEdges.js"></script> -->
   <script>
 
     var windowWidth = $(window).width();
@@ -505,6 +490,39 @@
     // let removedNodes = []
     let currentNodes = nodes;
     let currentEdges = edges;
+
+    const updatedNodes = [];
+    const updatedEdges = [];
+
+
+    const nodesList = ["AlSF", "Arch", "Burk", "ByKc", "Chmv", "DKK", "Dkkv", "EsDv", "Frcs", "Ftgy", "HfAd", "HgE", , "Higa", "IrbK", "IznC", "KktS", "Ks2S", "MEK", "MkyS", "MyjC", "MyjK", "NKIR", "Nkkv", "NrtE", "NRv", "Pika", "Prsv", "Saka", "SmnX", "SmsC", "Snal", "SPHK", "SYKI", "SySm", "TrmH", "TrmK"];
+
+    nodesList.forEach(d => {
+      const nodeFilename = `./data/nodes/${d}_rm_nodes.csv`;
+      const edgeFilename = `./data/edges/${d}_rm_edgelist.csv`;
+      const nodeArr = [];
+      const edgeArr = [];
+      d3.csv(nodeFilename, function (data) {
+        nodeArr.push(data);
+      })
+      d3.csv(edgeFilename, function (data) {
+        edgeArr.push(data);
+      })
+      const newNodeObj = {};
+      const newEdgeObj = {};
+      newNodeObj.node = d;
+      newNodeObj.nodes = nodeArr;
+      newEdgeObj.node = d;
+      newEdgeObj.edges = edgeArr;
+      //console.log(newNodeObj)
+      updatedNodes.push(newNodeObj);
+      updatedEdges.push(newEdgeObj);
+    })
+
+    console.log(updatedNodes)
+    console.log(updatedEdges)
+
+
 
 
     $(window).resize(function () {
@@ -599,6 +617,7 @@
         type: 'line',
         source: {
           type: 'geojson',
+          lineMetrics: true,
           data: edgesData
         },
         paint: {
@@ -621,11 +640,28 @@
             0.9,
             "#99000d"
           ],
+          'line-gradient': [
+            'interpolate',
+            ['linear'],
+            ['line-progress'],
+            0,
+            "#fee5d9",
+            0.1,
+            "#fcbba1",
+            0.3,
+            "#fc9272",
+            0.5,
+            "#fb6a4a",
+            0.7,
+            "#ef3b2c",
+            1,
+            "#cb181d"
+          ],
           'line-width': [
             'interpolate',
             ["linear"],
             ['get', 'weight'],
-            0.3,
+            0.1,
             1,
             0.9,
             9
@@ -652,13 +688,13 @@
             ["linear"],
             ['get', 'betweenness_C'],
             0,
-            2,
-            1,
-            12
+            4,
+            260,
+            25
           ],
           'circle-stroke-color': 'white',
           'circle-stroke-width': 1,
-          'circle-opacity': 1
+          'circle-opacity': 0.8
         }
       });
 
@@ -677,11 +713,12 @@
             'longitude': +row.long,
             'latitude': +row.lat,
             'name': row.name,
+            'fullname': row.full_name,
             'depth': row.depth,
             'tect': row.tect,
             'region': row.region,
-            'eigen_C': row.eigen_C,
-            'betweenness_C': row.betweenness_C
+            'eigen_C': +row.eigen_C,
+            'betweenness_C': +row.betweenness_C
           },
           'geometry': {
             'type': 'Point',
@@ -703,7 +740,7 @@
           'properties': {
             'source': row.Source,
             'target': row.Target,
-            'weight': row.Weight
+            'weight': +row.Weight
           },
           'geometry': {
             'type': 'LineString',
@@ -728,9 +765,10 @@
 
     function updateNodes() {
 
-      const newNodes = nodes.filter(d => d.name !== removedNode)
-      currentNodes = newNodes;
-      console.log(newNodes);
+      // const newNodes = nodes.filter(d => d.name !== removedNode)
+      const newNodes = updatedNodes.filter(d => d.node === removedNode)
+      // console.log(newNodes[0].nodes);
+      currentNodes = newNodes[0].nodes;
       createNodeData(currentNodes);
 
       map.getSource('nodesLayer').setData(nodesData);
@@ -743,13 +781,34 @@
 
       const newEdges = updatedEdges.find(d => d.node === removedNode);
       currentEdges = newEdges.edges;
-      console.log(newEdges);
+      // console.log(newEdges);
       createEdgeData(currentEdges);
 
       map.getSource('edgesLayer').setData(edgesData);
 
 
     }
+
+    // function findEdgesFromNode(name) {
+    //   const sourceList = currentEdges.find(d=>d.Source === name);
+    // }
+
+
+    map.on('mouseover', 'nodesLayer', (e) => {
+      map.getCanvas().style.cursor = 'pointer';
+      const name = e.features[0].properties.name;
+
+      map.setFilter('edgesLayer', ['==', 'source', name]);
+
+    })
+
+
+    map.on('mouseleave', 'nodesLayer', () => {
+      map.getCanvas().style.cursor = '';
+      map.setFilter('edgesLayer', null);
+    });
+
+
 
 
     map.on('click', 'nodesLayer', function (e) {
@@ -759,6 +818,7 @@
       var latitude = e.features[0].properties.latitude;
       var longitude = e.features[0].properties.longitude;
       var name = e.features[0].properties.name;
+      var fullname = e.features[0].properties.fullname;
       var depth = e.features[0].properties.depth;
       var tect = e.features[0].properties.tect;
       var region = e.features[0].properties.region;
@@ -776,7 +836,7 @@
         closeOnClick: true,
         className: 'nodes'
       })
-        .setHTML('<h3 class="nodes"><b>' + name + '</b></h3>'
+        .setHTML('<h3 class="nodes"><b>' + fullname + ' (' + name + ')' + '</b></h3>'
           + '<h4><b>Region</b>: ' + region + '<br>'
           + '<b>Depth</b>: ' + depth + '<br>'
           + '<b>Tect</b>: ' + tect + '<br>'
@@ -787,6 +847,7 @@
         .addTo(map);
 
       $(".button").on('click', function () {
+        $("#removedNode").html(removedNode)
         updateNodes();
         updateEdges();
       })
@@ -819,6 +880,7 @@
     //   var color = "#636363";
 
     //   popup = new mapboxgl.Popup({
+    //     anchor: "top",
     //     closeButton: true,
     //     closeOnClick: true,
     //     className: 'nodes'

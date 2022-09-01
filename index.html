@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-  <title>Connectivity</title>
+  <title>High Sea Connectivity</title>
   <meta name="description" content="Ocean floor">
   <meta name="author" content="Julia Janicki">
   <link rel="shortcut icon" href="#">
@@ -42,13 +42,14 @@
 
     a {
       text-decoration: none;
+      color: #2dc4b2;
     }
 
     .subtitle {
-      font-weight: 700;
-      text-decoration: underline;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      font-size: 14px;
     }
-
 
     #console {
       position: absolute;
@@ -132,7 +133,6 @@
       background-color: #189B68;
     }
 
-
     .flip {
       -webkit-transform: scaleX(-1);
       transform: scaleX(-1);
@@ -153,7 +153,7 @@
       font-family: 'Eczar', serif;
       color: #0c1b34;
       font-weight: 700;
-      margin-bottom: 15px;
+      margin-bottom: 30px;
     }
 
     .mapboxgl-popup {
@@ -183,7 +183,12 @@
     }
 
     .mapboxgl-popup.nodes h3 {
-      background: #636363 !important;
+      background: #7BA69A !important;
+      color: #fff;
+    }
+
+    .mapboxgl-popup.edges h3 {
+      background: #FCB1A7 !important;
       color: #fff;
     }
 
@@ -225,13 +230,13 @@
     }
 
     .instruction {
-      margin-top: 20px;
+      margin-bottom: 25px;
     }
 
     .instruction p {
-      color: #4159A8;
-      font-weight: 700;
-      font-size: 12px;
+      color: #4F8C76;
+      font-weight: 400;
+      font-size: 14px;
     }
 
     .button {
@@ -245,8 +250,10 @@
       line-height: 1.5;
       text-transform: uppercase;
       background-color: none;
-      max-width: 100px;
+      max-width: 200px;
       text-align: center;
+      border: 2px solid #7BA69A;
+      color: #7BA69A;
       -webkit-transition: all .5s ease;
       -moz-transition: all .5s ease;
       -ms-transition: all .5s ease;
@@ -261,15 +268,8 @@
       -moz-transition: all .5s ease;
       -ms-transition: all .5s ease;
       transition: all .5s ease;
-    }
-
-    .button.nodes:hover {
+      background-color: #7BA69A;
       color: white;
-    }
-
-    .button.nodes {
-      color: #777777;
-      border: 1.5px solid #777777;
     }
 
     .item {
@@ -313,6 +313,39 @@
       width: 120px;
     }
 
+    #reset {
+      width: 30px;
+      height: 30px;
+      margin-top: -5px;
+      margin-bottom: 5px;
+      fill: #767676;
+    }
+
+    #reset:hover {
+      fill: #cfcfcf;
+      transition: all 0.5s ease;
+      cursor: pointer;
+    }
+
+    #minCircle {
+      width: 10px;
+      height: 10px;
+    }
+
+    #maxCircle {
+      width: 40px;
+      height: 40px;
+    }
+
+    #minCircleVal,
+    #maxCircleVal {
+      padding-top: 10px;
+    }
+
+    #circleSizes {
+      margin-bottom: 20px;
+    }
+
     @media screen and (max-width: 800px) {
 
       #console {
@@ -331,25 +364,21 @@
         font-size: 12px;
       }
 
-      #console {
-        padding: 10px 20px;
-      }
-
-      #title {
-        margin-top: -10px;
-      }
-
       .mapboxgl-popup {
         max-width: 290px !important;
       }
     }
 
-    @media screen and (max-width: 600px) {
+    @media screen and (max-width: 550px) {
       body {
-        font-size: 11px !important;
+        font-size: 12px !important;
       }
 
       #title {
+        font-size: 14px;
+      }
+
+      .subtitle {
         font-size: 13px;
       }
 
@@ -392,7 +421,7 @@
 
       #logo {
         position: absolute;
-        bottom: 15px;
+        top: 15px;
         right: 0px;
       }
 
@@ -414,64 +443,47 @@
       <span id="toggleConsole">
         <img src="./img/toggle.png" />
       </span>
-      <h1 id='title'>Connectivity</h1>
-      <h2 class="subtitle"> Removed node: </h2>
-      <p id="removedNode"></p>
-      <!-- <div class="itemWrapper">
-        <div class='row toggle item filters' id="seamountFilter">
-          <input id='' type="radio" value="seamountOn" name="toggle" checked='checked'>
-          <input id='' type="radio" value="seamountOff" name="toggle">
-          <div class="toggle__pointer toggleSeamount"></div>
-        </div>
-        <div class="item">
-          <h2>Seamounts</h2>
-        </div>
-      </div>
-      <div class="itemWrapper">
-        <div class='row toggle item filters' id="ridgesFilter">
-          <input id='' type="radio" value="ridgesOn" name="toggleRidges" checked='checked'>
-          <input id='' type="radio" value="ridgesOff" name="toggleRidges">
-          <div class="toggle__pointer toggleRidges"></div>
-        </div>
-        <div class="item">
-          <h2>Ridges</h2>
-        </div>
-      </div>
-      <div class="itemWrapper">
-        <div class='row toggle item filters' id="trenchesFilter">
-          <input id='' type="radio" value="trenchesOn" name="toggleTrenches" checked='checked'>
-          <input id='' type="radio" value="trenchesOff" name="toggleTrenches">
-          <div class="toggle__pointer toggleTrenches"></div>
-        </div>
-        <div class="item">
-          <h2>Trenches</h2>
-        </div>
-      </div>
-      <div class="itemWrapper">
-        <div class='row toggle item filters' id="canyonsFilter">
-          <input id='' type="radio" value="canyonsOn" name="toggleCanyons" checked='checked'>
-          <input id='' type="radio" value="canyonsOff" name="toggleCanyons">
-          <div class="toggle__pointer toggleCanyons"></div>
-        </div>
-        <div class="item">
-          <h2>Canyons</h2>
-        </div>
-      </div> -->
-
+      <h1 id='title'>High Sea Connectivity</h1>
       <div class="instruction itemWrapper" id="instruction">
-        <p class="item">Click on the circles and lines for more information</p>
+        <p class="item">Click on a node to see more information and to have the option to
+          remove and see how it affects the network. <br><br> Circle sizes are proportional to in-betweenness while
+          line
+          thinkness are proportional to weight.</p>
+      </div>
+      <div class='itemWrapper'>
+        <p> In betweenness </p>
+      </div>
+      <div id="circleSizes">
+        <img id="minCircle" class='item' src="./img/legend.svg" />
+        <p id="minCircleVal" class='item'></p>
+        <img id="maxCircle" class='item' src="./img/legend.svg" />
+        <p id="maxCircleVal" class='item'></p>
       </div>
     </div>
-    <!-- end line -->
+    <svg id="reset" class="item" version="1.1" x="0px" y="0px" viewBox="0 0 48.9 42"
+      style="enable-background:new 0 0 48.9 42;" xml:space="preserve">
+      <g id="">
+        <path id="XMLID_2_" class="st0" d="M13.2,32.2c-4.1-4.1-5.4-9.7-4.3-14.9l4.4,1.4L10.1,6L0.1,14.3l4.4,1.4
+                 c-1.7,6.8,0.1,14.3,5.4,19.7c6.2,6.2,15.5,7.7,23.1,4.2L31.8,35C25.8,38.2,18.2,37.2,13.2,32.2z" />
+        <path id="XMLID_1_" class="st0" d="M44.5,26c1.7-6.8-0.1-14.3-5.4-19.7c-6.2-6.2-15.4-7.6-23-4.3l1.1,4.6c6-3,13.6-2.1,18.5,2.9
+                 c4.1,4.1,5.4,9.7,4.3,14.9l-4.4-1.4l3.1,12.7l10.1-8.4L44.5,26z" />
+      </g>
+    </svg>
+    <div class="item">
+      <p> Reset Nodes</p>
+    </div>
+    <p class="subtitle"> <b>Removed node:</b> <span id="removedNode"> None </span> </p>
+  </div>
+  </div>
+  <!-- end line -->
   </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
   <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.14.2/d3.js"></script>
   <script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
+  <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
   <script src="data/nodes.js"></script>
   <script src="data/edges.js"></script>
-  <!-- <script src="data/updatedNodes.js"></script>
-  <script src="data/updatedEdges.js"></script> -->
   <script>
 
     var windowWidth = $(window).width();
@@ -490,6 +502,19 @@
     // let removedNodes = []
     let currentNodes = nodes;
     let currentEdges = edges;
+
+    const sizeScale = d3.scaleLinear().domain([0, 260]).range([8, 45]);
+
+    const extent = d3.extent(currentNodes.map(d => +d.betweenness_C))
+
+    $("#minCircleVal").html(Math.round(extent[0]));
+    $("#maxCircleVal").html(Math.round(extent[1]));
+
+
+    $("#minCircle").css("width", sizeScale(Math.round(extent[0])));
+    $("#minCircle").css("height", sizeScale(Math.round(extent[0])));
+    $("#maxCircle").css("width", sizeScale(Math.round(extent[1])));
+    $("#maxCircle").css("height", sizeScale(Math.round(extent[1])));
 
     const updatedNodes = [];
     const updatedEdges = [];
@@ -519,10 +544,8 @@
       updatedEdges.push(newEdgeObj);
     })
 
-    console.log(updatedNodes)
-    console.log(updatedEdges)
-
-
+    // console.log(updatedNodes)
+    // console.log(updatedEdges)
 
 
     $(window).resize(function () {
@@ -549,12 +572,6 @@
       }
     }
 
-    if (viewportWidth < 700) {
-      $("#instruction").css("display", "none");
-    } else {
-      $("#instruction").css("display", "inherit");
-    }
-
     mapboxgl.accessToken = 'pk.eyJ1IjoidGhldGhpcmRwb2xlIiwiYSI6ImNLSWVDcWsifQ.vVx5f1hjIvHBeSpaY3NUkQ';
 
     let nodesData = {
@@ -568,7 +585,6 @@
       'features': [
       ]
     };
-
 
     if (mobile) {
       map = new mapboxgl.Map({
@@ -604,6 +620,8 @@
       map.addControl(new mapboxgl.NavigationControl());
     }
 
+    let popupBool = false;
+
 
     function init() {
       $('#loading').hide();
@@ -621,7 +639,7 @@
           data: edgesData
         },
         paint: {
-          "line-color": [
+          'line-color': [
             'interpolate',
             ["linear"],
             ['get', 'weight'],
@@ -640,23 +658,42 @@
             0.9,
             "#99000d"
           ],
-          'line-gradient': [
-            'interpolate',
-            ['linear'],
-            ['line-progress'],
-            0,
-            "#fee5d9",
-            0.1,
-            "#fcbba1",
-            0.3,
-            "#fc9272",
-            0.5,
-            "#fb6a4a",
-            0.7,
-            "#ef3b2c",
-            1,
-            "#cb181d"
-          ],
+          // "line-color": [
+          //   'interpolate',
+          //   ["linear"],
+          //   ['get', 'weight'],
+          //   0.3,
+          //   "#fee5d9",
+          //   0.4,
+          //   "#fcbba1",
+          //   0.5,
+          //   "#fc9272",
+          //   0.6,
+          //   "#fb6a4a",
+          //   0.7,
+          //   "#ef3b2c",
+          //   0.8,
+          //   "#cb181d",
+          //   0.9,
+          //   "#99000d"
+          // ],
+          // 'line-gradient': [
+          //   'interpolate',
+          //   ['linear'],
+          //   ['line-progress'],
+          //   0,
+          //   "#fee5d9",
+          //   0.1,
+          //   "#fcbba1",
+          //   0.3,
+          //   "#fc9272",
+          //   0.5,
+          //   "#fb6a4a",
+          //   0.7,
+          //   "#ef3b2c",
+          //   1,
+          //   "#cb181d"
+          // ],
           'line-width': [
             'interpolate',
             ["linear"],
@@ -682,7 +719,7 @@
           data: nodesData
         },
         paint: {
-          "circle-color": '#636363',
+          "circle-color": '#7BA69A',
           'circle-radius': [
             'interpolate',
             ["linear"],
@@ -747,21 +784,34 @@
             'coordinates': [findPoint(row.Source), findPoint(row.Target)],
           }
         };
+
+
+        // feature.geometry.coordinates = turf.bezierSpline(turf.lineString(feature.geometry.coordinates)).geometry.coordinates;
+
+        const start = findPoint(row.Source);
+        const end = findPoint(row.Target);
+        const distance = turf.distance(start, end, { units: 'miles' });
+        const midpoint = turf.midpoint(start, end);
+        const destination = turf.destination(midpoint, distance / 4, 80, { units: 'miles' });
+        // curvedLine gets rendered to the page
+        const curvedLine = turf.bezierSpline(
+          turf.lineString([start, destination.geometry.coordinates, end]),
+        );
+
+        // console.log(curvedLine)
+        // feature.geometry.coordinates = curvedLine.geometry.coordinates;
+
         edgesData['features'].push(feature);
       });
+
     }
 
 
     function findPoint(name) {
       const node = currentNodes.find(d => d.name === name);
-      //console.log(node)
       return [node.long, node.lat]
     }
 
-
-    function createEdges() {
-
-    }
 
     function updateNodes() {
 
@@ -771,9 +821,22 @@
       currentNodes = newNodes[0].nodes;
       createNodeData(currentNodes);
 
+      const extent = d3.extent(currentNodes.map(d => +d.betweenness_C))
+
+      $("#minCircleVal").html(Math.round(extent[0]));
+      $("#maxCircleVal").html(Math.round(extent[1]));
+      $("#minCircle").css("width", sizeScale(Math.round(extent[0])));
+      $("#minCircle").css("height", sizeScale(Math.round(extent[0])));
+      $("#maxCircle").css("width", sizeScale(Math.round(extent[1])));
+      $("#maxCircle").css("height", sizeScale(Math.round(extent[1])));
+
       map.getSource('nodesLayer').setData(nodesData);
 
-      popup.remove();
+      if (popupBool) {
+        popup.remove();
+        popupBool = false;
+      }
+
 
     }
 
@@ -781,7 +844,6 @@
 
       const newEdges = updatedEdges.find(d => d.node === removedNode);
       currentEdges = newEdges.edges;
-      // console.log(newEdges);
       createEdgeData(currentEdges);
 
       map.getSource('edgesLayer').setData(edgesData);
@@ -808,10 +870,30 @@
       map.setFilter('edgesLayer', null);
     });
 
+    $("#reset").click(function () {
+      if (popupBool) {
+        popup.remove();
+        popupBool = false;
+      }
+
+      currentNodes = nodes;
+      currentEdges = edges;
+      createNodeData(currentNodes);
+      map.getSource('nodesLayer').setData(nodesData);
+
+      createEdgeData(currentEdges);
+      map.getSource('edgesLayer').setData(edgesData);
+
+      $("#removedNode").html('None')
+
+    });
+
 
 
 
     map.on('click', 'nodesLayer', function (e) {
+
+      popupBool = true;
 
       map.getCanvas().style.cursor = 'pointer';
 
@@ -829,7 +911,7 @@
 
       // removedNodes.push(name);
 
-      var color = "#636363";
+      var color = "#FCB1A7";
 
       popup = new mapboxgl.Popup({
         closeButton: true,
@@ -847,67 +929,25 @@
         .addTo(map);
 
       $(".button").on('click', function () {
-        $("#removedNode").html(removedNode)
+        if (popupBool) {
+          popup.remove();
+          popupBool = false;
+        }
+        $("#removedNode").html(fullname);
         updateNodes();
         updateEdges();
       })
-
-
-      $(`.button.nodes`).hover(function () {
-        $(".button a").css("color", "white");
-        $(this).css("background-color", color);
-      }, function () {
-        $(".button a").css("color", color);
-        $(this).css("background-color", "white");
-      });
       $(".mapboxgl-popup-tip").css("border-bottom-color", color);
-
       $(".mapboxgl-popup-tip").css("border-bottom-color", color);
 
     });
 
 
+
+
     // map.on('click', 'edgesLayer', function (e) {
 
-    //   map.getCanvas().style.cursor = 'pointer';
-
-    //   var source = e.features[0].properties.source;
-    //   var target = e.features[0].properties.target;
-    //   var weight = e.features[0].properties.weight;
-
-    //   // removedNodes.push(name);
-
-    //   var color = "#636363";
-
-    //   popup = new mapboxgl.Popup({
-    //     anchor: "top",
-    //     closeButton: true,
-    //     closeOnClick: true,
-    //     className: 'nodes'
-    //   })
-    //     .setHTML('<h3 class="nodes"><b>' + source + "-" + target + '</b></h3>'
-    //       + '<h4><b>Weight</b>: ' + weight + '<br></h4>')
-    //     .setLngLat([e.lngLat.lng, e.lngLat.lat])
-    //     .addTo(map);
-
-
-    //   $(".mapboxgl-popup-tip").css("border-bottom-color", color);
-
-    //   $(".mapboxgl-popup-tip").css("border-bottom-color", color);
-
-    // });
-
-
-
-
-
-
-
-
-
-
-    // function callPopupEdges(e) {
-
+    //   popupBool = true;
 
     //   map.getCanvas().style.cursor = 'pointer';
 
@@ -917,53 +957,23 @@
 
     //   // removedNodes.push(name);
 
-    //   var color = "#636363";
+    //   var color = "#AECFBA";
 
     //   popup = new mapboxgl.Popup({
     //     closeButton: true,
     //     closeOnClick: true,
-    //     className: 'nodes'
+    //     className: 'edges'
     //   })
-    //     .setHTML('<h3 class="nodes"><b>' + source + "-" + target + '</b></h3>'
+    //     .setHTML('<h3 class="edges"><b>' + source + "-" + target + '</b></h3>'
     //       + '<h4><b>Weight</b>: ' + weight + '<br></h4>')
     //     .setLngLat([e.lngLat.lng, e.lngLat.lat])
     //     .addTo(map);
 
 
     //   $(".mapboxgl-popup-tip").css("border-bottom-color", color);
-
     //   $(".mapboxgl-popup-tip").css("border-bottom-color", color);
 
-
-    // }
-
-
-
-
-    // const handleMapClick = (e) => {
-
-    //   let features = map.queryRenderedFeatures(e.point, {
-    //     layers: ['nodesLayer', 'edgesLayer']
-    //   });
-
-    //   if (!features) return;
-
-    //   const selectedFeature = features.find((feature) => ['nodesLayer', 'edgesLayer'].includes(feature.layer.id),);
-
-    //   if (!selectedFeature) return;
-
-    //   if (selectedFeature.source === "nodesLayer") {
-    //     callPopupNodes(e);
-    //   } else {
-    //     callPopupEdges(e);
-    //   }
-    // }
-
-    // map.on('click', function (e) {
-    //   handleMapClick(e);
     // });
-
-
 
   </script>
 </body>
